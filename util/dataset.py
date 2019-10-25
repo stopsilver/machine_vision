@@ -169,7 +169,7 @@ class AnomalyDataset(Dataset):
 
             self.data = torch.cat(data)
             self.targets = torch.cat(targets)
-            self.len = self.data[0]
+            self.len = len(self.data)
 
         if partial:
             self.len = int(self.len / 10)
@@ -208,9 +208,9 @@ if __name__ == '__main__':
 
     p = '/home/jieun/Documents/machine_vision/data'
     # trainset = AnomalyDataset(flag='CIFAR10', dp=p, train=True, test='cat', transform=transform)
-    # trainset = AnomalyDataset(flag='MNIST', dp=p, train=True, test='0', transform=transform)
+    trainset = AnomalyDataset(flag='MNIST', dp=p, train=True, test='0', transform=transform)
 
-    trainset = BinaryDataset(flag='CIFAR10', dp=p, train=True, test='cat', transform=transform)
+    # trainset = BinaryDataset(flag='CIFAR10', dp=p, train=True, test='cat', transform=transform)
     # trainset = BinaryDataset(flag='MNIST', dp=p, train=True, test='0', transform=transform)
 
     train_len = len(trainset)
