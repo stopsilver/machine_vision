@@ -13,8 +13,11 @@ def graph_loss(filename):
     plt.show()
 
 
-def plot_re(filename):
-    loss, di = joblib.load(filename)
+def plot_re(filename, data=None):
+    if data is not None:
+        di = data
+    else:
+        loss, di = joblib.load(filename)
     label = di['total_label']
     re = di['reconstuction_error']
 
@@ -30,5 +33,6 @@ def plot_re(filename):
     plt.show()
 
 
-# plot_re('/home/jieun/Documents/machine_vision/log/191016_01.log')
-plot_re('/home/jieun/Documents/machine_vision/log/191016_02.log')
+if __name__ == '__main__':
+    # plot_re('/home/jieun/Documents/machine_vision/log/191016_01.log')
+    plot_re('/home/jieun/Documents/machine_vision/log/191021_02.log')

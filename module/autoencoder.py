@@ -9,7 +9,7 @@ from util.dataset import AnomalyDataset
 from datetime import datetime
 from PIL import Image
 
-LOG_FILE = 'log/191016_02.log'
+LOG_FILE = 'log/191021_01.log'
 
 
 class Autoencoder(torch.nn.Module):
@@ -105,11 +105,22 @@ def run():
         images_input = images_input.to(device)
 
         y_pred = autoencoder(images_input)
-        pic = y_pred.cpu().view(-1, 3, 32, 32).detach().numpy().transpose((0, 2, 3, 1))
 
         # print(test_criterion(y_pred, images))
         sub_reconstuction_error = PairwiseDistance(2).forward(y_pred, images_input).tolist()
+        reconstuction_error.extend(sub_reconstuction_error)
 
+    for idx, data in enumerate(test_loader, 0):
+        images, _ = data[:2]
+
+        n_data = images.shape[0]
+        images_input = images.view(n_data, -1)
+
+        images_input = images_input.to(device)
+
+        y_pred = autoencoder(images_input)
+
+        pic = y_pred.cpu().view(-1, 3, 32, 32).detach().numpy().transpose((0, 2, 3, 1))
         if idx <= 10:
             fig = plt.figure()
             fig.add_subplot(1, 2, 1)
@@ -117,27 +128,18 @@ def run():
             fig.add_subplot(1, 2, 2)
             plt.imshow(pic[0], interpolation='bicubic')
 
-            plt.show()
+            plt.savefig('/home/jieun/Documents/machine_vision/imgs/{}.png'.format('ae'+str(idx)))
 
-        reconstuction_error.extend(sub_reconstuction_error)
+            # plt.show()
 
-    for idx, data in enumerate(test_loader, 0):
-        images, _ = data[:2]
-
-        n_data = images.shape[0]
-        images = images.view(n_data, -1)
-
-        images = images.to(device)
-
-        y_pred = autoencoder(images)
-        sub_reconstuction_error = PairwiseDistance(2).forward(y_pred, images).tolist()
+        sub_reconstuction_error = PairwiseDistance(2).forward(y_pred, images_input).tolist()
 
         reconstuction_error.extend(sub_reconstuction_error)
 
     di = {'total_label': total_labels, 'reconstuction_error': reconstuction_error}
 
-    # import joblib
-    # joblib.dump([losses, di], LOG_FILE)
+    import joblib
+    joblib.dump([losses, di], LOG_FILE)
 
     plt.plot(range(1, len(losses) + 1), losses)
     plt.show()
